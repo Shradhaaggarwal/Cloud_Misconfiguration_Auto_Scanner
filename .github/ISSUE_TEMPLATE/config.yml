@@ -1,0 +1,11 @@
+blank_issues_enabled: false
+contact_links:
+  - name: 🔒 Security Vulnerability
+    url: mailto:security@example.com
+    about: Please report security vulnerabilities privately via email
+  - name: 💬 General Discussion
+    url: https://github.com/AnirudhDattu/Cloud_Misconfiguration_Auto_Scanner/discussions
+    about: Ask questions and discuss ideas with the community
+  - name: 📖 Documentation
+    url: https://github.com/AnirudhDattu/Cloud_Misconfiguration_Auto_Scanner/blob/main/README.md
+    about: Check out our comprehensive documentation

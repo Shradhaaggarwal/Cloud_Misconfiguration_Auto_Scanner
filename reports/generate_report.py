@@ -4,12 +4,17 @@ from db import dao
 from datetime import datetime
 import os
 
-def generate_report(output_name="azure_report.pdf"):
+def generate_report(output_name="azure_report.pdf", run_id=None):
     # Ensure export folder exists
     export_dir = os.path.join("reports", "exports")
     os.makedirs(export_dir, exist_ok=True)
 
-    findings = dao.get_all_findings()
+    # Get findings (all or specific run)
+    if run_id:
+        findings = dao.get_findings_by_run(run_id)
+    else:
+        findings = dao.get_all_findings()
+
     total = len(findings)
     high = sum(1 for f in findings if f["severity"] == "High")
     medium = sum(1 for f in findings if f["severity"] == "Medium")
@@ -20,6 +25,7 @@ def generate_report(output_name="azure_report.pdf"):
 
     html_content = template.render(
         generated_at=datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
+        run_id=run_id if run_id else "All Runs",
         total=total,
         high=high,
         medium=medium,
@@ -36,8 +42,11 @@ def generate_report(output_name="azure_report.pdf"):
     pdf_path = os.path.join(export_dir, output_name)
     pdfkit.from_file(html_path, pdf_path)
 
-    print(f"✅ Report generated: {pdf_path}")
     return pdf_path
 
+
 if __name__ == "__main__":
-    generate_report("azure_report.pdf")
+    from datetime import datetime
+    timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+    generate_report(f"azure_report_{timestamp}.pdf")
+

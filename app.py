@@ -70,6 +70,9 @@ def landing_page():
         st.json(findings)
 
 def dashboard_page():
+    import pandas as pd
+    import plotly.express as px
+
     st.header("📊 Security Dashboard")
     findings = dao.get_all_findings()
     if not findings:
@@ -88,7 +91,7 @@ def dashboard_page():
     col3.metric("Medium", meds, delta=f"{int((meds/total)*100)}%")
     col4.metric("Low", lows, delta=f"{int((lows/total)*100)}%")
 
-    # Pie chart of severity
+    # Pie chart
     fig = px.pie(
         names=["High", "Medium", "Low"],
         values=[highs, meds, lows],
@@ -97,6 +100,26 @@ def dashboard_page():
         color_discrete_map={"High":"red","Medium":"orange","Low":"green"}
     )
     st.plotly_chart(fig)
+
+    # Trendline chart (new)
+    st.subheader("📈 Findings Trend over Runs")
+    trend = dao.get_findings_trend()
+    if trend:
+        df_trend = pd.DataFrame(trend)
+        df_trend["started_at"] = pd.to_datetime(df_trend["started_at"])
+
+        line = px.line(
+            df_trend,
+            x="started_at",
+            y="findings",
+            text="findings",
+            markers=True,
+            title="Findings per Run Over Time"
+        )
+        st.plotly_chart(line)
+    else:
+        st.info("No runs recorded yet.")
+
 
 def findings_page():
     import pandas as pd
@@ -142,9 +165,32 @@ def database_page():
     st.write("Raw DB contents:")
     st.json(findings)
 
+from reports.generate_report import generate_report
+import os
+
 def reports_page():
     st.header("📝 Reports")
-    st.info("Export to HTML/PDF (coming soon). Will include executive summary, findings, and appendix.")
+
+    # List available runs
+    runs = dao.get_all_runs()  # we’ll add this helper
+    run_ids = [r["id"] for r in runs]
+
+    st.write("Select which run to generate a report for:")
+    run_choice = st.selectbox("Run ID", ["All Runs"] + run_ids)
+
+    if st.button("Generate Report PDF"):
+        timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+        filename = f"azure_report_{timestamp}.pdf"
+
+        if run_choice == "All Runs":
+            pdf_path = generate_report(filename)
+        else:
+            pdf_path = generate_report(filename, run_id=run_choice)
+
+        st.success(f"Report generated: {pdf_path}")
+        with open(pdf_path, "rb") as f:
+            st.download_button("⬇️ Download Report", f, file_name=filename)
+
 
 # ------------- NAVIGATION ----------------
 def main():

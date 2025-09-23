@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Azure Misconfiguration Report</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 40px;
+        }
+
+        h1 {
+            color: #2E86C1;
+        }
+
+        h2 {
+            color: #117A65;
+        }
+
+        table {
+            border-collapse: collapse;
+            width: 100%;
+            margin-top: 20px;
+        }
+
+        th,
+        td {
+            border: 1px solid #ccc;
+            padding: 8px;
+            text-align: left;
+        }
+
+        th {
+            background: #f4f4f4;
+        }
+
+        .high {
+            background: #E74C3C;
+            color: white;
+        }
+
+        .medium {
+            background: #F39C12;
+            color: white;
+        }
+
+        .low {
+            background: #27AE60;
+            color: white;
+        }
+    </style>
+</head>
+
+<body>
+    <h1>☁️ Azure Misconfiguration Report</h1>
+    <p><b>Generated:</b> {{ generated_at }}</p>
+
+    <h2>Summary</h2>
+    <ul>
+        <li>Total Findings: {{ total }}</li>
+        <li>High Severity: {{ high }}</li>
+        <li>Medium Severity: {{ medium }}</li>
+        <li>Low Severity: {{ low }}</li>
+    </ul>
+
+    <h2>Findings</h2>
+    <table>
+        <thead>
+            <tr>
+                <th>Rule ID</th>
+                <th>Service</th>
+                <th>Title</th>
+                <th>Severity</th>
+                <th>Resource</th>
+                <th>Remediation</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for f in findings %}
+            <tr class="{{ f.severity|lower }}">
+                <td>{{ f.rule_id }}</td>
+                <td>{{ f.service }}</td>
+                <td>{{ f.title }}</td>
+                <td>{{ f.severity }}</td>
+                <td>{{ f.resource_id }}</td>
+                <td>{{ f.remediation }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</body>
+
+</html>

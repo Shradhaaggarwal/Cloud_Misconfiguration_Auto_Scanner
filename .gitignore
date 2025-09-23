@@ -1,0 +1,5 @@
+.env
+sp_credentials.json
+scanner_azure.db
+__pycache__/
+*.pyc

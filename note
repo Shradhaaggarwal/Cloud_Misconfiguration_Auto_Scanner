@@ -1,0 +1,4 @@
+cd "D:\SEM - 7\PRJ - 4\cloud-scanner-azure"
+.\venv\Scripts\Activate.ps1
+
+python run_scan.py

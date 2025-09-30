@@ -9,6 +9,7 @@ from st_aggrid import AgGrid, GridOptionsBuilder
 # project modules
 from scanner.inventory import list_storage_accounts
 from scanner.checks_azure import check_storage_public_blob_access
+from scanner.check_storage_encryption import check_storage_encryption
 from scanner.check_vms import list_vms_with_public_ip
 from scanner.check_nsg import check_open_nsg_rules
 from db import dao
@@ -28,6 +29,7 @@ def run_all_checks():
                 result = future.result()
                 if service == "storage":
                     findings += check_storage_public_blob_access(result)
+                    findings += check_storage_encryption(result)
                 else:
                     findings += result
             except Exception as e:
@@ -84,6 +86,11 @@ def dashboard_page():
     highs = sum(1 for f in findings if f["severity"] == "High")
     meds = sum(1 for f in findings if f["severity"] == "Medium")
     lows = sum(1 for f in findings if f["severity"] == "Low")
+
+    # Highlight storage encryption findings
+    encryption_findings = [f for f in findings if f["rule_id"] == "AZ-Storage-Encryption-001"]
+    if encryption_findings:
+        st.info(f"🔒 {len(encryption_findings)} Storage Accounts missing encryption!")
 
     col1, col2, col3, col4 = st.columns(4)
     col1.metric("Total Findings", total)
@@ -145,18 +152,55 @@ def findings_page():
     st.write("### Filter Findings")
     severity = st.multiselect("Filter by Severity", ["High", "Medium", "Low"])
     service = st.multiselect("Filter by Service", list(df["service"].unique()))
+    rule = st.multiselect("Filter by Rule ID", list(df["rule_id"].unique()))
 
     filtered = df
     if severity:
         filtered = filtered[filtered["severity"].isin(severity)]
     if service:
         filtered = filtered[filtered["service"].isin(service)]
+    if rule:
+        filtered = filtered[filtered["rule_id"].isin(rule)]
 
     st.write(f"Showing {len(filtered)} findings")
 
-    st.dataframe(
-        filtered.style.applymap(color_severity, subset=["severity"])
-    )
+    # Show evidence details for encryption findings
+    if not filtered.empty:
+        st.write("### Evidence Preview for Encryption Findings")
+        enc_findings = filtered[filtered["rule_id"] == "AZ-Storage-Encryption-001"]
+        for _, row in enc_findings.iterrows():
+            st.info(f"Resource: {row['resource_name']} | Evidence: {row['evidence']}")
+
+    # Show a full-width table with wrapped evidence and remediation
+    if not filtered.empty:
+        import html
+        def format_evidence(ev):
+            if isinstance(ev, dict):
+                return html.escape(json.dumps(ev, indent=2, ensure_ascii=False))
+            return html.escape(str(ev))
+
+        def format_remediation(rem):
+            if isinstance(rem, list):
+                return "<ul>" + "".join(f"<li>{html.escape(str(r))}</li>" for r in rem) + "</ul>"
+            return html.escape(str(rem))
+
+        # Build HTML table
+        table_html = "<table style='width:100%;table-layout:fixed;word-break:break-word;'>"
+        table_html += "<tr>" + "".join(f"<th>{col}</th>" for col in ["Rule ID", "Service", "Title", "Severity", "Resource", "Evidence", "Remediation"]) + "</tr>"
+        for _, row in filtered.iterrows():
+            table_html += "<tr>"
+            table_html += f"<td>{html.escape(str(row['rule_id']))}</td>"
+            table_html += f"<td>{html.escape(str(row['service']))}</td>"
+            table_html += f"<td>{html.escape(str(row['title']))}</td>"
+            table_html += f"<td>{html.escape(str(row['severity']))}</td>"
+            table_html += f"<td>{html.escape(str(row.get('resource_name', row.get('resource_id'))))}</td>"
+            table_html += f"<td><pre style='white-space:pre-wrap;'>{format_evidence(row['evidence'])}</pre></td>"
+            table_html += f"<td>{format_remediation(row['remediation'])}</td>"
+            table_html += "</tr>"
+        table_html += "</table>"
+        st.markdown(table_html, unsafe_allow_html=True)
+    else:
+        st.info("No findings to display.")
 
 
 def database_page():

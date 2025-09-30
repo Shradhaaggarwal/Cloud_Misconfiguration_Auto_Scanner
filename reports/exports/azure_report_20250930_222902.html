@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Azure Misconfiguration Report</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 40px;
+        }
+
+        h1 {
+            color: #2E86C1;
+        }
+
+        h2 {
+            color: #117A65;
+        }
+
+        table {
+            border-collapse: collapse;
+            width: 100%;
+            margin-top: 20px;
+        }
+
+        th,
+        td {
+            border: 1px solid #ccc;
+            padding: 8px;
+            text-align: left;
+        }
+
+        th {
+            background: #f4f4f4;
+        }
+
+        .high {
+            background: #E74C3C;
+            color: white;
+        }
+
+        .medium {
+            background: #F39C12;
+            color: white;
+        }
+
+        .low {
+            background: #27AE60;
+            color: white;
+        }
+    </style>
+</head>
+
+<body>
+    <h1>☁️ Azure Misconfiguration Report</h1>
+    <p><b>Generated:</b> 2025-09-30 22:29:02</p>
+
+    <h2>Summary</h2>
+    <ul>
+        <li>Total Findings: 3</li>
+        <li>High Severity: 0</li>
+        <li>Medium Severity: 0</li>
+        <li>Low Severity: 3</li>
+    </ul>
+
+    <h2>Findings</h2>
+    <table>
+        <thead>
+            <tr>
+                <th>Rule ID</th>
+                <th>Service</th>
+                <th>Title</th>
+                <th>Severity</th>
+                <th>Resource</th>
+                <th>Remediation</th>
+            </tr>
+        </thead>
+        <tbody>
+            
+            <tr class="low">
+                <td>ERROR</td>
+                <td>storage</td>
+                <td>Error scanning storage</td>
+                <td>Low</td>
+                <td>-</td>
+                <td>[]</td>
+            </tr>
+            
+            <tr class="low">
+                <td>ERROR</td>
+                <td>vms</td>
+                <td>Error scanning vms</td>
+                <td>Low</td>
+                <td>-</td>
+                <td>[]</td>
+            </tr>
+            
+            <tr class="low">
+                <td>ERROR</td>
+                <td>nsgs</td>
+                <td>Error scanning nsgs</td>
+                <td>Low</td>
+                <td>-</td>
+                <td>[]</td>
+            </tr>
+            
+        </tbody>
+    </table>
+</body>
+
+</html>

@@ -25,6 +25,13 @@ def check_open_nsg_rules():
             if src in ["*", "0.0.0.0/0", "Internet"]:
                 port = rule.destination_port_range
                 if port in ["22", "3389", "*"]:  # SSH, RDP, or all ports
+                    evidence = {
+                        "nsg_name": nsg.name,
+                        "rule_name": rule.name,
+                        "source_address_prefix": src,
+                        "destination_port_range": port,
+                        "resource_id": nsg.id
+                    }
                     findings.append({
                         "rule_id": "AZ-NSG-OPEN-001",
                         "service": "NetworkSecurityGroup",
@@ -33,6 +40,7 @@ def check_open_nsg_rules():
                         "rule_name": rule.name,
                         "title": f"NSG allows {src} to port {port}",
                         "severity": "High",
+                        "evidence": evidence,
                         "remediation": [
                             f"Restrict NSG rule {rule.name} on {nsg.name} to only trusted IP ranges.",
                             "Use Just-In-Time access or Azure Bastion for admin access."

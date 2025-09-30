@@ -4,6 +4,7 @@ from scanner.checks_azure import check_storage_public_blob_access
 from scanner.check_storage_encryption import check_storage_encryption
 from scanner.check_vms import list_vms_with_public_ip
 from scanner.check_nsg import check_open_nsg_rules
+from scanner.check_function_apps import check_unrestricted_function_apps
 import json
 
 def run():
@@ -20,6 +21,9 @@ def run():
 
     print("Scanning NSGs for open rules...")
     findings += check_open_nsg_rules()
+
+    print("Scanning Function Apps for anonymous access...")
+    findings += check_unrestricted_function_apps()
 
     print(f"\nTotal findings: {len(findings)}")
     if findings:

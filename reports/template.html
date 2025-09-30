@@ -100,6 +100,9 @@
                                         {% if f.evidence.last_enabled_time %}
                                             <b>Last Enabled Time:</b> {{ f.evidence.last_enabled_time }}<br>
                                         {% endif %}
+                                    {% elif f.rule_id == 'AZ-FunctionApp-Anonymous-001' %}
+                                        <b>Auth Enabled:</b> {{ f.evidence.auth_enabled }}<br>
+                                        <b>Default Provider:</b> {{ f.evidence.default_provider }}<br>
                                     {% else %}
                                         {{ f.evidence }}
                                     {% endif %}

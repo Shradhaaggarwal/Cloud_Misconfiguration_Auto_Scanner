@@ -27,6 +27,12 @@ def check_storage_public_blob_access(storage_accounts):
 
         # We consider True (explicit) a finding
         if allow_public is True:
+            evidence = {
+                "allow_blob_public_access": True,
+                "storage_account": sa.get("name"),
+                "resource_group": sa.get("resource_group"),
+                "id": sa.get("id")
+            }
             findings.append({
                 "rule_id": "AZ-Storage-PublicBlob-001",
                 "service": "StorageAccount",
@@ -35,10 +41,12 @@ def check_storage_public_blob_access(storage_accounts):
                 "resource_group": sa.get("resource_group"),
                 "title": "Storage account allows public blob access",
                 "severity": "High",
-                "evidence": {"allow_blob_public_access": True},
+                "evidence": evidence,
                 "remediation": [
                     "Set allow_blob_public_access on the storage account to false.",
                     "Audit containers and set container public access to 'private'."
                 ]
             })
     return findings
+
+

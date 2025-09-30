@@ -43,6 +43,11 @@ def list_vms_with_public_ip():
                     vm_public_ips.append({"nic": nic_name, "public_ip": ip_address})
 
         if vm_public_ips:
+            evidence = {
+                "vm_name": vm_name,
+                "resource_id": vm.id,
+                "public_ips": vm_public_ips
+            }
             findings.append({
                 "rule_id": "AZ-VM-PUBIP-001",
                 "service": "VirtualMachine",
@@ -51,6 +56,7 @@ def list_vms_with_public_ip():
                 "public_ips": vm_public_ips,
                 "title": "VM has public IP(s)",
                 "severity": "Medium",
+                "evidence": evidence,
                 "remediation": [
                     "Remove public IP from NIC if not required",
                     "Use Azure Bastion or VPN instead of public IP"

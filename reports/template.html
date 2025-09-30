@@ -74,6 +74,7 @@
                 <th>Severity</th>
                 <th>Resource</th>
                 <th>Remediation</th>
+                <th>Evidence</th>
             </tr>
         </thead>
         <tbody>
@@ -84,7 +85,28 @@
                 <td>{{ f.title }}</td>
                 <td>{{ f.severity }}</td>
                 <td>{{ f.resource_id }}</td>
-                <td>{{ f.remediation }}</td>
+                <td>{{ f.remediation|join('<br>') if f.remediation is iterable else f.remediation }}</td>
+                                <td>
+                                    {% if f.rule_id == 'AZ-Storage-Encryption-001' %}
+                                        {% if f.evidence.key_source %}
+                                            <b>Key Source:</b> {{ f.evidence.key_source }}<br>
+                                        {% endif %}
+                                        {% if f.evidence.key_vault_properties %}
+                                            <b>Key Vault Properties:</b> {{ f.evidence.key_vault_properties }}<br>
+                                        {% endif %}
+                                        {% if f.evidence.enabled is defined %}
+                                            <b>Blob Encryption Enabled:</b> {{ f.evidence.enabled }}<br>
+                                        {% endif %}
+                                        {% if f.evidence.last_enabled_time %}
+                                            <b>Last Enabled Time:</b> {{ f.evidence.last_enabled_time }}<br>
+                                        {% endif %}
+                                    {% elif f.rule_id == 'AZ-FunctionApp-Anonymous-001' %}
+                                        <b>Auth Enabled:</b> {{ f.evidence.auth_enabled }}<br>
+                                        <b>Default Provider:</b> {{ f.evidence.default_provider }}<br>
+                                    {% else %}
+                                        {{ f.evidence }}
+                                    {% endif %}
+                                </td>
             </tr>
             {% endfor %}
         </tbody>

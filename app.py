@@ -12,6 +12,7 @@ from scanner.checks_azure import check_storage_public_blob_access
 from scanner.check_storage_encryption import check_storage_encryption
 from scanner.check_vms import list_vms_with_public_ip
 from scanner.check_nsg import check_open_nsg_rules
+from scanner.check_function_apps import check_unrestricted_function_apps
 from db import dao
 
 # ------------- SCAN ENGINE (parallel) -------------
@@ -22,6 +23,7 @@ def run_all_checks():
             executor.submit(list_storage_accounts): "storage",
             executor.submit(list_vms_with_public_ip): "vms",
             executor.submit(check_open_nsg_rules): "nsgs",
+            executor.submit(check_unrestricted_function_apps): "functionapps",
         }
         for future in concurrent.futures.as_completed(futures):
             service = futures[future]

@@ -5,50 +5,65 @@
     <meta charset="UTF-8">
     <title>Azure Misconfiguration Report</title>
     <style>
-        body {
-            font-family: Arial, sans-serif;
-            margin: 40px;
-        }
+        /* Base page styles */
+        body { font-family: Arial, sans-serif; margin: 40px; color: #222; }
+        h1 { color: #2E86C1; margin-bottom: 0.2em; }
+        h2 { color: #117A65; margin-top: 1.4em; }
 
-        h1 {
-            color: #2E86C1;
-        }
-
-        h2 {
-            color: #117A65;
-        }
-
+        /* Table improvements to avoid vertical/letter-wrapped text */
         table {
             border-collapse: collapse;
             width: 100%;
+            max-width: 100%;
             margin-top: 20px;
+            table-layout: auto; /* allow engine to size columns to content */
         }
 
-        th,
-        td {
+        th, td {
             border: 1px solid #ccc;
-            padding: 8px;
+            padding: 10px 12px;
             text-align: left;
+            vertical-align: middle; /* vertically center content */
+            white-space: normal; /* wrap at words */
+            overflow-wrap: anywhere; /* break long tokens if necessary */
+            word-break: normal;
+            hyphens: auto;
+            box-sizing: border-box;
+            overflow: visible; /* ensure content isn't clipped */
         }
 
         th {
             background: #f4f4f4;
+            font-weight: 600;
+            white-space: nowrap; /* keep header text on one line */
         }
 
-        .high {
-            background: #E74C3C;
-            color: white;
+        /* Column width hints (percentages + min-width) to avoid extremely narrow columns in PDF */
+        th:nth-child(1), td:nth-child(1) { width: 8%; min-width: 80px; }
+        th:nth-child(2), td:nth-child(2) { width: 8%; min-width: 80px; }
+        th:nth-child(3), td:nth-child(3) { width: 20%; min-width: 140px; }
+        th:nth-child(4), td:nth-child(4) { width: 8%; min-width: 70px; }
+        th:nth-child(5), td:nth-child(5) { width: 14%; min-width: 100px; }
+        th:nth-child(6), td:nth-child(6) { width: 22%; min-width: 150px; }
+        th:nth-child(7), td:nth-child(7) { width: 20%; min-width: 150px; }
+
+        /* Helper block for large cell content: preserve newlines, wrap words, don't clip */
+        .cell-content {
+            display: block;
+            width: 100%;
+            white-space: pre-wrap; /* preserve existing line breaks and wrap long lines */
+            word-wrap: break-word;
+            overflow-wrap: anywhere;
+            word-break: break-word;
+            hyphens: auto;
+            overflow: visible;
+            max-width: 100%;
         }
 
-        .medium {
-            background: #F39C12;
-            color: white;
-        }
-
-        .low {
-            background: #27AE60;
-            color: white;
-        }
+        /* Severity coloring */
+        .high { background: #E74C3C; color: white; }
+        .medium { background: #F39C12; color: white; }
+        .low { background: #27AE60; color: white; }
     </style>
 </head>
 
@@ -85,28 +100,40 @@
                 <td>{{ f.title }}</td>
                 <td>{{ f.severity }}</td>
                 <td>{{ f.resource_id }}</td>
-                <td>{{ f.remediation|join('<br>') if f.remediation is iterable else f.remediation }}</td>
-                                <td>
-                                    {% if f.rule_id == 'AZ-Storage-Encryption-001' %}
-                                        {% if f.evidence.key_source %}
-                                            <b>Key Source:</b> {{ f.evidence.key_source }}<br>
-                                        {% endif %}
-                                        {% if f.evidence.key_vault_properties %}
-                                            <b>Key Vault Properties:</b> {{ f.evidence.key_vault_properties }}<br>
-                                        {% endif %}
-                                        {% if f.evidence.enabled is defined %}
-                                            <b>Blob Encryption Enabled:</b> {{ f.evidence.enabled }}<br>
-                                        {% endif %}
-                                        {% if f.evidence.last_enabled_time %}
-                                            <b>Last Enabled Time:</b> {{ f.evidence.last_enabled_time }}<br>
-                                        {% endif %}
-                                    {% elif f.rule_id == 'AZ-FunctionApp-Anonymous-001' %}
-                                        <b>Auth Enabled:</b> {{ f.evidence.auth_enabled }}<br>
-                                        <b>Default Provider:</b> {{ f.evidence.default_provider }}<br>
-                                    {% else %}
-                                        {{ f.evidence }}
-                                    {% endif %}
-                                </td>
+                <td>
+                    <div class="cell-content">
+                        {%- if f.remediation is string -%}
+                            {{ f.remediation }}
+                        {%- elif f.remediation is iterable -%}
+                            {{ f.remediation|join('<br>')|safe }}
+                        {%- else -%}
+                            {{ f.remediation }}
+                        {%- endif -%}
+                    </div>
+                </td>
+                <td>
+                    <div class="cell-content">
+                    {% if f.rule_id == 'AZ-Storage-Encryption-001' %}
+                        {% if f.evidence.key_source %}
+                            <b>Key Source:</b> {{ f.evidence.key_source }}<br>
+                        {% endif %}
+                        {% if f.evidence.key_vault_properties %}
+                            <b>Key Vault Properties:</b> {{ f.evidence.key_vault_properties }}<br>
+                        {% endif %}
+                        {% if f.evidence.enabled is defined %}
+                            <b>Blob Encryption Enabled:</b> {{ f.evidence.enabled }}<br>
+                        {% endif %}
+                        {% if f.evidence.last_enabled_time %}
+                            <b>Last Enabled Time:</b> {{ f.evidence.last_enabled_time }}<br>
+                        {% endif %}
+                    {% elif f.rule_id == 'AZ-FunctionApp-Anonymous-001' %}
+                        <b>Auth Enabled:</b> {{ f.evidence.auth_enabled }}<br>
+                        <b>Default Provider:</b> {{ f.evidence.default_provider }}<br>
+                    {% else %}
+                        {{ f.evidence }}
+                    {% endif %}
+                    </div>
+                </td>
             </tr>
             {% endfor %}
         </tbody>

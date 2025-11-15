@@ -1,0 +1,106 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="900" viewBox="0 0 1200 900">
+  <style>
+    .box { fill:#ffffff; stroke:#2c3e50; stroke-width:2; rx:8; }
+    .cloud { fill:#e8f6ff; stroke:#2e86c1; stroke-width:2; rx:10; }
+    .text { font-family: Arial, sans-serif; font-size:14px; fill:#111827; }
+    .title { font-size:18px; font-weight:700; fill:#0b4a6f; }
+    .arrow { stroke:#2c3e50; stroke-width:2; fill:none; marker-end:url(#arrowhead); }
+    .note { font-size:12px; fill:#4b5563; }
+    .bg { fill:#f7fafc; }
+  </style>
+
+  <defs>
+    <marker id="arrowhead" markerWidth="10" markerHeight="8" refX="10" refY="4" orient="auto">
+      <path d="M0,0 L10,4 L0,8 z" fill="#2c3e50" />
+    </marker>
+  </defs>
+
+  <!-- Title -->
+  <text x="30" y="30" class="title">Cloud_Misconfiguration_Auto_Scanner — Architecture Flowchart</text>
+  <text x="30" y="52" class="note">(Streamlit UI, CLI runner, scanner modules, DB, report generation)</text>
+
+  <!-- Left column: Inputs / Entry points -->
+  <rect x="30" y="90" width="300" height="70" class="box" />
+  <text x="50" y="120" class="text">Streamlit UI</text>
+  <text x="50" y="138" class="note">file: app.py</text>
+
+  <rect x="30" y="180" width="300" height="70" class="box" />
+  <text x="50" y="210" class="text">CLI Runner</text>
+  <text x="50" y="228" class="note">file: run_scan.py / run_nsg_scan.py</text>
+
+  <rect x="30" y="270" width="300" height="70" class="cloud" />
+  <text x="50" y="300" class="text">Azure Subscription</text>
+  <text x="50" y="318" class="note">queried via Azure SDKs</text>
+
+  <!-- Middle column: Inventory & Scanners -->
+  <rect x="380" y="90" width="420" height="80" class="box" />
+  <text x="400" y="115" class="text">Inventory / Discovery</text>
+  <text x="400" y="135" class="note">file: scanner/inventory.py</text>
+
+  <rect x="380" y="190" width="420" height="340" class="box" />
+  <text x="400" y="215" class="text">Scanner Modules</text>
+  <text x="400" y="235" class="note">files: scanner/checks_azure.py, check_vms.py, check_nsg.py, check_storage_encryption.py, check_function_apps.py</text>
+
+  <!-- Right column: Persistence & Reports -->
+  <rect x="840" y="120" width="300" height="90" class="box" />
+  <text x="860" y="150" class="text">Database (SQLite)</text>
+  <text x="860" y="168" class="note">file: db/dao.py (stores runs & findings)</text>
+
+  <rect x="840" y="240" width="300" height="100" class="box" />
+  <text x="860" y="270" class="text">Report Generator</text>
+  <text x="860" y="288" class="note">file: reports/generate_report.py</text>
+  <text x="860" y="305" class="note">template: reports/template.html → exports/*.html/*.pdf</text>
+
+  <rect x="840" y="360" width="300" height="70" class="cloud" />
+  <text x="860" y="395" class="text">wkhtmltopdf</text>
+  <text x="860" y="413" class="note">used by pdfkit to create PDF</text>
+
+  <!-- Arrows: UI/CLI -> Inventory/Scanners -->
+  <path d="M330 125 L380 125" class="arrow" />
+  <path d="M330 210 L380 210" class="arrow" />
+
+  <!-- Arrow: Azure Subscription -> Inventory -->
+  <path d="M180 305 L380 305" class="arrow" />
+
+  <!-- Arrows: Inventory -> Scanners -->
+  <path d="M560 170 L560 190" class="arrow" />
+
+  <!-- Arrow: Scanners -> DB -->
+  <path d="M800 310 L840 310" class="arrow" />
+
+  <!-- Arrow: Scanners -> Report Generator (via DB or direct) -->
+  <path d="M800 360 L840 300" class="arrow" />
+
+  <!-- Arrow: Report Generator -> wkhtmltopdf -->
+  <path d="M990 340 L990 360" class="arrow" />
+  <path d="M990 430 L990 432" class="arrow" />
+
+  <!-- Notes / Legend -->
+  <rect x="30" y="370" width="400" height="150" class="box" />
+  <text x="40" y="395" class="text">Typical flow</text>
+  <text x="40" y="415" class="note">1. User triggers scan via Streamlit UI or CLI</text>
+  <text x="40" y="433" class="note">2. Inventory queries Azure and returns resources</text>
+  <text x="40" y="451" class="note">3. Scanner modules evaluate resources and create findings</text>
+  <text x="40" y="469" class="note">4. Findings are saved to DB and reported via HTML/PDF</text>
+
+  <!-- Small component boxes inside Scanners area -->
+  <rect x="420" y="240" width="180" height="48" class="box" />
+  <text x="440" y="268" class="text">check_storage_public_blob</text>
+  <rect x="610" y="240" width="190" height="48" class="box" />
+  <text x="630" y="268" class="text">check_storage_encryption</text>
+
+  <rect x="420" y="300" width="180" height="48" class="box" />
+  <text x="440" y="328" class="text">check_vms (public IP)</text>
+  <rect x="610" y="300" width="190" height="48" class="box" />
+  <text x="630" y="328" class="text">check_nsg (open rules)</text>
+
+  <rect x="420" y="360" width="380" height="48" class="box" />
+  <text x="440" y="388" class="text">check_function_apps (anonymous auth)</text>
+
+  <!-- External SDK note -->
+  <text x="30" y="540" class="note">External libraries: azure-identity, azure-mgmt-storage, azure-mgmt-network, azure-mgmt-compute, azure-mgmt-web, pdfkit</text>
+
+  <!-- Footer -->
+  <text x="30" y="580" class="note">Generated: 2025-10-01 — Flowchart showing core modules and dataflow for this repo</text>
+</svg>

@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Azure Misconfiguration Report</title>
+    <style>
+        /* Base page styles */
+        body { font-family: Arial, sans-serif; margin: 40px; color: #222; }
+        h1 { color: #2E86C1; margin-bottom: 0.2em; }
+        h2 { color: #117A65; margin-top: 1.4em; }
+
+        /* Table improvements to avoid vertical/letter-wrapped text */
+        table {
+            border-collapse: collapse;
+            width: 100%;
+            max-width: 100%;
+            margin-top: 20px;
+            table-layout: auto; /* allow engine to size columns to content */
+        }
+
+        th, td {
+            border: 1px solid #ccc;
+            padding: 10px 12px;
+            text-align: left;
+            vertical-align: middle; /* vertically center content */
+            white-space: normal; /* wrap at words */
+            overflow-wrap: anywhere; /* break long tokens if necessary */
+            word-break: normal;
+            hyphens: auto;
+            box-sizing: border-box;
+            overflow: visible; /* ensure content isn't clipped */
+        }
+
+        th {
+            background: #f4f4f4;
+            font-weight: 600;
+            white-space: nowrap; /* keep header text on one line */
+        }
+
+        /* Column width hints (percentages + min-width) to avoid extremely narrow columns in PDF */
+        th:nth-child(1), td:nth-child(1) { width: 8%; min-width: 80px; }
+        th:nth-child(2), td:nth-child(2) { width: 8%; min-width: 80px; }
+        th:nth-child(3), td:nth-child(3) { width: 20%; min-width: 140px; }
+        th:nth-child(4), td:nth-child(4) { width: 8%; min-width: 70px; }
+        th:nth-child(5), td:nth-child(5) { width: 14%; min-width: 100px; }
+        th:nth-child(6), td:nth-child(6) { width: 22%; min-width: 150px; }
+        th:nth-child(7), td:nth-child(7) { width: 20%; min-width: 150px; }
+
+        /* Helper block for large cell content: preserve newlines, wrap words, don't clip */
+        .cell-content {
+            display: block;
+            width: 100%;
+            white-space: pre-wrap; /* preserve existing line breaks and wrap long lines */
+            word-wrap: break-word;
+            overflow-wrap: anywhere;
+            word-break: break-word;
+            hyphens: auto;
+            overflow: visible;
+            max-width: 100%;
+        }
+
+        /* Severity coloring */
+        .high { background: #E74C3C; color: white; }
+        .medium { background: #F39C12; color: white; }
+        .low { background: #27AE60; color: white; }
+    </style>
+</head>
+
+<body>
+    <h1>☁️ Azure Misconfiguration Report</h1>
+    <p><b>Generated:</b> 2025-11-23 22:02:35</p>
+
+    <h2>Summary</h2>
+    <ul>
+        <li>Total Findings: 2</li>
+        <li>High Severity: 1</li>
+        <li>Medium Severity: 1</li>
+        <li>Low Severity: 0</li>
+    </ul>
+
+    <h2>Findings</h2>
+    <table>
+        <thead>
+            <tr>
+                <th>Rule ID</th>
+                <th>Service</th>
+                <th>Title</th>
+                <th>Severity</th>
+                <th>Resource</th>
+                <th>Remediation</th>
+                <th>Evidence</th>
+            </tr>
+        </thead>
+        <tbody>
+            
+            <tr class="medium">
+                <td>AZ-VM-PUBIP-001</td>
+                <td>VirtualMachine</td>
+                <td>VM has public IP(s)</td>
+                <td>Medium</td>
+                <td>/subscriptions/e33e36ed-7f8c-48ae-8ad8-7e9250fae874/resourceGroups/SCAN-TEST-RG/providers/Microsoft.Compute/virtualMachines/scan-test-vm</td>
+                <td>
+                    <div class="cell-content">["Remove public IP from NIC if not required", "Use Azure Bastion or VPN instead of public IP"]</div>
+                </td>
+                <td>
+                    <div class="cell-content">
+                    
+                        {"vm_name": "scan-test-vm", "resource_id": "/subscriptions/e33e36ed-7f8c-48ae-8ad8-7e9250fae874/resourceGroups/SCAN-TEST-RG/providers/Microsoft.Compute/virtualMachines/scan-test-vm", "public_ips": [{"nic": "scan-test-vm103_z2", "public_ip": "135.235.194.167"}]}
+                    
+                    </div>
+                </td>
+            </tr>
+            
+            <tr class="high">
+                <td>AZ-NSG-OPEN-001</td>
+                <td>NetworkSecurityGroup</td>
+                <td>NSG allows * to port 22</td>
+                <td>High</td>
+                <td>/subscriptions/e33e36ed-7f8c-48ae-8ad8-7e9250fae874/resourceGroups/scan-test-rg/providers/Microsoft.Network/networkSecurityGroups/scan-test-vm-nsg</td>
+                <td>
+                    <div class="cell-content">["Restrict NSG rule SSH on scan-test-vm-nsg to only trusted IP ranges.", "Use Just-In-Time access or Azure Bastion for admin access."]</div>
+                </td>
+                <td>
+                    <div class="cell-content">
+                    
+                        {"nsg_name": "scan-test-vm-nsg", "rule_name": "SSH", "source_address_prefix": "*", "destination_port_range": "22", "resource_id": "/subscriptions/e33e36ed-7f8c-48ae-8ad8-7e9250fae874/resourceGroups/scan-test-rg/providers/Microsoft.Network/networkSecurityGroups/scan-test-vm-nsg"}
+                    
+                    </div>
+                </td>
+            </tr>
+            
+        </tbody>
+    </table>
+</body>
+
+</html>
